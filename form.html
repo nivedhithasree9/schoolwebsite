@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admission Form</title>
+<style>
+:root {
+    --bg: #f6efe5;
+    --paper: rgba(255, 252, 246, 0.96);
+    --ink: #1f2333;
+    --brand: #0f4c5c;
+    --brand-dark: #093845;
+    --warm: #c97f39;
+    --line: rgba(31, 35, 51, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(201, 127, 57, 0.24), transparent 20%),
+        radial-gradient(circle at right, rgba(15, 76, 92, 0.16), transparent 24%),
+        linear-gradient(180deg, #f7f1e9, #efe5d6);
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 20px;
+    width: min(1240px, calc(100% - 28px));
+    margin: 18px auto 32px;
+}
+
+.panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(41, 32, 22, 0.1);
+}
+
+.form-shell {
+    padding: 28px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(15, 76, 92, 0.08);
+    color: var(--brand);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 18px 0 6px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.02;
+}
+
+.subtitle {
+    margin: 0 0 24px;
+    max-width: 680px;
+    line-height: 1.6;
+}
+
+.section {
+    margin-top: 26px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 1.1rem;
+}
+
+.section-title::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--warm);
+}
+
+.row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.field {
+    flex: 1;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 0.94rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid rgba(31, 35, 51, 0.14);
+    border-radius: 14px;
+    background: #fff;
+    font: inherit;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 96px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+
+.btn {
+    background: var(--brand);
+    color: #fff;
+}
+
+.btn:hover {
+    background: var(--brand-dark);
+}
+
+.btn-secondary {
+    background: rgba(31, 35, 51, 0.06);
+    color: var(--ink);
+}
+
+.btn-secondary:hover {
+    background: rgba(31, 35, 51, 0.1);
+}
+
+.status {
+    min-height: 24px;
+    margin-top: 12px;
+}
+
+.side {
+    position: sticky;
+    top: 18px;
+    height: fit-content;
+    padding: 24px;
+}
+
+.preview-card {
+    overflow: hidden;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #fffdf8, #f7f1e8);
+    color: var(--ink);
+    border: 1px solid rgba(31, 35, 51, 0.1);
+}
+
+.card-head {
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(15, 76, 92, 0.96), rgba(9, 56, 69, 0.96));
+    color: white;
+    text-align: center;
+}
+
+.card-head h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.card-head p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.92rem;
+}
+
+.id-body {
+    padding: 18px;
+}
+
+.avatar-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.avatar-image {
+    display: block;
+    width: 110px;
+    height: 110px;
+    border-radius: 26px;
+    object-fit: cover;
+    border: 3px solid rgba(15, 76, 92, 0.12);
+    background: rgba(15, 76, 92, 0.08);
+}
+
+.id-title {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.id-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.id-item {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(15, 76, 92, 0.05);
+    border: 1px solid rgba(15, 76, 92, 0.08);
+}
+
+.id-item strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--brand);
+    font-size: 0.88rem;
+}
+
+.barcode-box {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 16px;
+    background: white;
+    border: 1px dashed rgba(31, 35, 51, 0.16);
+    text-align: center;
+}
+
+.barcode-box img {
+    width: 100%;
+    max-width: 190px;
+    display: block;
+    margin: 0 auto 6px;
+}
+
+.barcode-box span {
+    font-size: 0.82rem;
+    color: rgba(31, 35, 51, 0.7);
+}
+
+.tips {
+    margin-top: 18px;
+    padding: 22px;
+}
+
+.tips h3 {
+    margin-top: 0;
+}
+
+.tips ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.7;
+}
+
+@media (max-width: 980px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .side {
+        position: static;
+    }
+}
+
+@media (max-width: 720px) {
+    .form-shell {
+        padding: 18px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+    <section class="panel form-shell">
+        <div class="topbar">
+            <span class="badge">Student Admission Portal</span>
+            <a class="btn-secondary" href="index.html">Back To Home</a>
+        </div>
+
+        <h1>Admission Registration</h1>
+        <p class="subtitle">
+            Fill in the student, parent, and school details below. This enhanced layout is designed to look polished during project demos and viva presentations.
+        </p>
+
+        <div class="section">
+            <div class="section-title">Student Details</div>
+            <div class="row">
+                <div class="field">
+                    <label for="name">Full Name</label>
+                    <input id="name">
+                </div>
+                <div class="field">
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                        <option>Boy</option>
+                        <option>Girl</option>
+                        <option>TG</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="aadhaar">Aadhaar Number</label>
+                    <input id="aadhaar">
+                </div>
+                <div class="field">
+                    <label for="phone">Phone Number</label>
+                    <input id="phone">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="dob">Date Of Birth</label>
+                    <input id="dob" type="date">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Father Details</div>
+            <div class="row">
+                <div class="field">
+                    <label for="father">Father Name</label>
+                    <input id="father">
+                </div>
+                <div class="field">
+                    <label for="focc">Occupation</label>
+                    <input id="focc">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="faadhaar">Father Aadhaar</label>
+                    <input id="faadhaar">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Mother Details</div>
+            <div class="row">
+                <div class="field">
+                    <label for="mother">Mother Name</label>
+                    <input id="mother">
+                </div>
+                <div class="field">
+                    <label for="mocc">Occupation</label>
+                    <input id="mocc">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="maadhaar">Mother Aadhaar</label>
+                    <input id="maadhaar">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">School Details</div>
+            <div class="row">
+                <div class="field">
+                    <label for="school">Previous School</label>
+                    <input id="school">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="class">Class Applying For</label>
+                    <input id="class">
+                </div>
+                <div class="field">
+                    <label for="medium">Medium</label>
+                    <input id="medium">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Community And Remarks</div>
+            <div class="row">
+                <div class="field">
+                    <label for="nation">Nationality</label>
+                    <input id="nation">
+                </div>
+                <div class="field">
+                    <label for="state">State</label>
+                    <input id="state">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="religion">Religion</label>
+                    <input id="religion">
+                </div>
+                <div class="field">
+                    <label for="caste">Caste</label>
+                    <input id="caste">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks"></textarea>
+                </div>
+            </div>
+        </div>
+
+    <div class="actions">
+        <button class="btn" id="submitBtn" type="button">Submit Admission</button>
+        <button class="btn-secondary" id="resetBtn" type="button">Reset Form</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="status" id="studentIdStatus"></div>
+</section>
+
+    <aside class="side">
+        <div class="preview-card">
+            <div class="card-head">
+                <h2>Student ID Card</h2>
+                <p>Taraka Rama Public School</p>
+            </div>
+            <div class="id-body">
+                <div class="avatar-wrap">
+                    <img class="avatar-image" id="avatarBox" alt="Virtual student avatar">
+                </div>
+                <h2 class="id-title" id="previewName">Student Name</h2>
+                <div class="id-grid">
+                    <div class="id-item"><strong>Father Name</strong><span id="previewFather">Not set</span></div>
+                    <div class="id-item"><strong>Class</strong><span id="previewClass">Not set</span></div>
+                    <div class="id-item"><strong>Contact</strong><span id="previewPhone">Not set</span></div>
+                    <div class="id-item"><strong>Date Of Birth</strong><span id="previewDob">Not set</span></div>
+                    <div class="id-item"><strong>School Name</strong><span id="previewSchool">Taraka Rama Public School</span></div>
+                    <div class="id-item"><strong>Reception Scan Code</strong><span id="previewMeta">Pending student details</span></div>
+                </div>
+                <div class="barcode-box">
+                    <img id="barcodeBox" alt="Reception barcode preview">
+                    <span>Scan for student information at reception</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel tips">
+            <h3>Presentation Add-ons</h3>
+            <ul>
+                <li>Live preview makes the form feel more interactive during your demo.</li>
+                <li>Structured sections help explain the workflow clearly in project review.</li>
+                <li>Validation plus MySQL storage shows both frontend and backend knowledge.</li>
+            </ul>
+        </div>
+    </aside>
+</div>
+
+<script src="api.js"></script>
+<script>
+function getFormData() {
+    return {
+        name: document.getElementById("name").value.trim(),
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("dob").value.trim(),
+        aadhaar: document.getElementById("aadhaar").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        father: document.getElementById("father").value.trim(),
+        focc: document.getElementById("focc").value.trim(),
+        faadhaar: document.getElementById("faadhaar").value.trim(),
+        mother: document.getElementById("mother").value.trim(),
+        mocc: document.getElementById("mocc").value.trim(),
+        maadhaar: document.getElementById("maadhaar").value.trim(),
+        school: document.getElementById("school").value.trim(),
+        class_name: document.getElementById("class").value.trim(),
+        medium: document.getElementById("medium").value.trim(),
+        nation: document.getElementById("nation").value.trim(),
+        state_name: document.getElementById("state").value.trim(),
+        religion: document.getElementById("religion").value.trim(),
+        caste: document.getElementById("caste").value.trim(),
+        remarks: document.getElementById("remarks").value.trim()
+    };
+}
+
+function setStatus(message, isError = false) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.style.color = isError ? "#a61b1b" : "#0f4c5c";
+}
+
+function resetForm(clearStudentId = true) {
+    document.querySelectorAll("input, textarea").forEach((field) => {
+        field.value = "";
+    });
+    document.getElementById("gender").value = "Boy";
+    if (clearStudentId) {
+        document.getElementById("studentIdStatus").textContent = "";
+    }
+    updatePreview();
+}
+
+function updatePreview() {
+    const data = getFormData();
+    const barcodeValue = `${data.name || "STUDENT"}|${data.father || "FATHER"}|${data.class_name || "CLASS"}|${data.phone || "PHONE"}|TRPS`;
+    document.getElementById("avatarBox").src = avatarUrl(data);
+    document.getElementById("barcodeBox").src = barcodeUrl(barcodeValue);
+    document.getElementById("previewName").textContent = data.name || "Student Name";
+    document.getElementById("previewMeta").textContent = barcodeValue;
+    document.getElementById("previewClass").textContent = data.class_name || "Not set";
+    document.getElementById("previewPhone").textContent = data.phone || "Not set";
+    document.getElementById("previewDob").textContent = data.dob || "Not set";
+    document.getElementById("previewFather").textContent = data.father || "Not set";
+    document.getElementById("previewSchool").textContent = data.school || "Taraka Rama Public School";
+}
+
+async function submitForm() {
+    const data = getFormData();
+
+    if (!data.name) {
+        setStatus("Enter name.", true);
+        return;
+    }
+    if (!data.dob) {
+        setStatus("Enter date of birth.", true);
+        return;
+    }
+
+    if (!/^\d{12}$/.test(data.aadhaar)) {
+        setStatus("Aadhaar must be 12 digits.", true);
+        return;
+    }
+
+    if (!/^\d{10}$/.test(data.phone)) {
+        setStatus("Phone must be 10 digits.", true);
+        return;
+    }
+
+    const button = document.getElementById("submitBtn");
+    button.disabled = true;
+    setStatus("Saving admission...");
+
+    try {
+        const result = await apiRequest("/create_student", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        setStatus("Admission saved successfully. The record is now available in the admin dashboard.");
+        resetForm(false);
+        document.getElementById("studentIdStatus").textContent = `Student ID: ${result.student_unique_id}`;
+        alert("Saved successfully");
+    } catch (error) {
+        setStatus(error.message || "Failed to save student.", true);
+        alert(`Error: ${error.message}`);
+    } finally {
+        button.disabled = false;
+    }
+}
+
+document.querySelectorAll("input, select, textarea").forEach((field) => {
+    field.addEventListener("input", updatePreview);
+});
+document.getElementById("submitBtn").addEventListener("click", submitForm);
+document.getElementById("resetBtn").addEventListener("click", () => {
+    resetForm();
+    setStatus("Form cleared.");
+});
+updatePreview();
+</script>
+</body>
+</html>

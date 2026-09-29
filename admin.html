@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<style>
+:root {
+    --ink: #1f2333;
+    --brand: #234e52;
+    --brand-dark: #18363a;
+    --warm: #c97f39;
+    --danger: #a72c2c;
+    --paper: rgba(255, 252, 246, 0.96);
+    --line: rgba(31, 35, 51, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top right, rgba(35, 78, 82, 0.18), transparent 20%),
+        radial-gradient(circle at left center, rgba(201, 127, 57, 0.18), transparent 18%),
+        linear-gradient(180deg, #f7f1e7, #eee4d6);
+}
+
+.shell {
+    width: min(1280px, calc(100% - 26px));
+    margin: 18px auto 34px;
+}
+
+.hero,
+.panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(47, 37, 20, 0.1);
+}
+
+.hero {
+    padding: 28px;
+}
+
+.hero-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(35, 78, 82, 0.08);
+    color: var(--brand);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+h1 {
+    margin: 18px 0 8px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.hero p {
+    max-width: 780px;
+    margin: 0;
+    line-height: 1.65;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn,
+.btn-secondary,
+.danger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+
+.btn {
+    background: var(--brand);
+    color: #fff;
+}
+
+.btn:hover {
+    background: var(--brand-dark);
+}
+
+.btn-secondary {
+    background: rgba(31, 35, 51, 0.06);
+    color: var(--ink);
+}
+
+.btn-secondary:hover {
+    background: rgba(31, 35, 51, 0.1);
+}
+
+.danger-btn {
+    background: rgba(167, 44, 44, 0.12);
+    color: var(--danger);
+}
+
+.danger-btn:hover {
+    background: rgba(167, 44, 44, 0.2);
+}
+
+.grid {
+    display: grid;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard {
+    grid-template-columns: 1.1fr 0.9fr;
+}
+
+.triple-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.panel {
+    padding: 22px;
+}
+
+.stat-card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    color: var(--brand);
+}
+
+.stat-card span {
+    color: rgba(31, 35, 51, 0.72);
+}
+
+.panel h2 {
+    margin-top: 0;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+input,
+select {
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font: inherit;
+    background: #fff;
+}
+
+input {
+    flex: 1;
+    min-width: 220px;
+}
+
+select {
+    min-width: 160px;
+}
+
+.chart-list,
+.recent-list {
+    display: grid;
+    gap: 12px;
+}
+
+.chart-item,
+.recent-item,
+.student-card,
+.notice-card,
+.due-card {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(35, 78, 82, 0.04);
+    border: 1px solid rgba(35, 78, 82, 0.08);
+}
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    resize: vertical;
+    font: inherit;
+    background: #fff;
+}
+
+.stack {
+    display: grid;
+    gap: 12px;
+}
+
+.inline-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.hidden {
+    display: none;
+}
+
+.student-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.student-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 1px solid rgba(35, 78, 82, 0.16);
+    background: rgba(35, 78, 82, 0.08);
+}
+
+.bar {
+    height: 10px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: rgba(35, 78, 82, 0.08);
+    overflow: hidden;
+}
+
+.bar span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brand), var(--warm));
+}
+
+.students-grid {
+    display: grid;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.student-card h3 {
+    margin: 0 0 10px;
+}
+
+.student-card p {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+
+.status {
+    min-height: 24px;
+    margin-top: 14px;
+}
+
+.empty {
+    padding: 26px;
+    border: 1px dashed rgba(31, 35, 51, 0.18);
+    border-radius: 18px;
+    text-align: center;
+}
+
+@media (max-width: 980px) {
+    .summary-grid,
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .shell {
+        width: calc(100% - 16px);
+        margin-top: 10px;
+    }
+
+    .summary-grid,
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .filters,
+    .actions {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <div class="hero-top">
+            <span class="badge">Administrative Control Room</span>
+            <div class="actions">
+                <a class="btn-secondary" href="index.html">Home</a>
+                <button class="btn-secondary" id="toggleDueBtn" type="button">View Due Members</button>
+                <button class="btn-secondary" id="exportBtn" type="button">Export CSV</button>
+                <button class="btn" id="refreshBtn" type="button">Refresh</button>
+                <button class="danger-btn" id="logoutBtn" type="button">Logout</button>
+            </div>
+        </div>
+        <h1>Admission Dashboard</h1>
+        <p>Track totals, review recent admissions, filter records, and export the student register. This makes the project presentation feel more complete and data-driven.</p>
+    </section>
+
+    <section class="grid summary-grid">
+        <div class="panel stat-card">
+            <strong id="totalStudents">0</strong>
+            <span>Total Students</span>
+        </div>
+        <div class="panel stat-card">
+            <strong id="totalBoys">0</strong>
+            <span>Boys</span>
+        </div>
+        <div class="panel stat-card">
+            <strong id="totalGirls">0</strong>
+            <span>Girls</span>
+        </div>
+        <div class="panel stat-card">
+            <strong id="totalTg">0</strong>
+            <span>TG</span>
+        </div>
+    </section>
+
+    <section class="grid dashboard">
+        <div class="panel">
+            <h2>Class-Wise Distribution</h2>
+            <div class="chart-list" id="classChart"></div>
+        </div>
+        <div class="panel">
+            <h2>Recent Admissions</h2>
+            <div class="recent-list" id="recentAdmissions"></div>
+        </div>
+    </section>
+
+    <section class="grid triple-grid">
+        <div class="panel">
+            <h2>Due Members</h2>
+            <p>Use this section during the demo to show students who still have pending fees and fines.</p>
+            <div class="stack hidden" id="dueMembersPanel">
+                <div id="dueMembersList"></div>
+            </div>
+        </div>
+        <div class="panel" style="grid-column: span 2;">
+            <h2>Notice Board</h2>
+            <p>Post a notice once here and it will appear in the student login screen and student dashboard.</p>
+            <div class="stack">
+                <input type="text" id="noticeTitle" placeholder="Notice title">
+                <textarea id="noticeMessage" placeholder="Write the notice that should alert all students"></textarea>
+                <div class="inline-actions">
+                    <button class="btn" id="publishNoticeBtn" type="button">Publish Notice</button>
+                    <button class="btn-secondary" id="refreshNoticeBtn" type="button">Refresh Notices</button>
+                </div>
+                <div id="noticeList"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Student Records</h2>
+        <div class="filters">
+            <input type="text" id="search" placeholder="Search by student name">
+            <select id="genderFilter">
+                <option value="">All Genders</option>
+            </select>
+            <select id="classFilter">
+                <option value="">All Classes</option>
+            </select>
+        </div>
+        <div class="status" id="status"></div>
+        <div class="students-grid" id="data"></div>
+    </section>
+</div>
+
+<script src="api.js"></script>
+<script>
+let allStudents = [];
+let dueMembersVisible = false;
+
+function adminHeaders(extra = {}) {
+    return {
+        ...extra,
+        "X-Admin-Token": getAdminToken()
+    };
+}
+
+function setStatus(message, isError = false) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.style.color = isError ? "#a61b1b" : "#234e52";
+}
+
+function requireLogin() {
+    if (!getAdminToken()) {
+        window.location.href = "login.html";
+        return false;
+    }
+    return true;
+}
+
+function fillSummary(summary) {
+    document.getElementById("totalStudents").textContent = summary.total_students || 0;
+    document.getElementById("totalBoys").textContent = summary.boys || 0;
+    document.getElementById("totalGirls").textContent = summary.girls || 0;
+    document.getElementById("totalTg").textContent = summary.tg || 0;
+
+    const classChart = document.getElementById("classChart");
+    const maxValue = Math.max(...(summary.class_breakdown || []).map((item) => Number(item.total)), 1);
+    if (!summary.class_breakdown || !summary.class_breakdown.length) {
+        classChart.innerHTML = '<div class="empty">No class distribution available yet.</div>';
+    } else {
+        classChart.innerHTML = summary.class_breakdown.map((item) => {
+            const width = Math.max(10, Math.round((Number(item.total) / maxValue) * 100));
+            return `
+                <div class="chart-item">
+                    <strong>${item.class_name || "Unspecified"}</strong> - ${item.total} student(s)
+                    <div class="bar"><span style="width:${width}%"></span></div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    const recentAdmissions = document.getElementById("recentAdmissions");
+    if (!summary.recent_admissions || !summary.recent_admissions.length) {
+        recentAdmissions.innerHTML = '<div class="empty">No recent admissions available.</div>';
+    } else {
+        recentAdmissions.innerHTML = summary.recent_admissions.map((item) => `
+            <div class="recent-item">
+                <strong>${item.name || "Student"}</strong>
+                <div>Class: ${item.class_name || "Not set"}</div>
+                <div>Record ID: ${item.id}</div>
+            </div>
+        `).join("");
+    }
+}
+
+function updateFilters() {
+    const genderFilter = document.getElementById("genderFilter");
+    const classFilter = document.getElementById("classFilter");
+    const selectedGender = genderFilter.value;
+    const selectedClass = classFilter.value;
+
+    const genders = [...new Set(allStudents.map((student) => student.gender).filter(Boolean))];
+    const classes = [...new Set(allStudents.map((student) => student.class_name).filter(Boolean))].sort();
+
+    genderFilter.innerHTML = '<option value="">All Genders</option>' + genders.map((gender) => `<option value="${gender}">${gender}</option>`).join("");
+    classFilter.innerHTML = '<option value="">All Classes</option>' + classes.map((className) => `<option value="${className}">${className}</option>`).join("");
+
+    genderFilter.value = selectedGender;
+    classFilter.value = selectedClass;
+}
+
+function fillDueMembers(members) {
+    const list = document.getElementById("dueMembersList");
+    if (!members.length) {
+        list.innerHTML = '<div class="empty">No pending fee members right now.</div>';
+        return;
+    }
+
+    list.innerHTML = members.map((member) => `
+        <div class="due-card">
+            <strong>${member.name || "Student"}</strong>
+            <div>ID: ${member.student_unique_id || "-"}</div>
+            <div>Class: ${member.class_name || "-"}</div>
+            <div>Phone: ${member.phone || "-"}</div>
+            <div>Due Amount: ${member.due_amount || 0}</div>
+            <div>Fine: ${member.fine_amount || 0}</div>
+        </div>
+    `).join("");
+}
+
+function fillNotices(notices) {
+    const list = document.getElementById("noticeList");
+    if (!notices.length) {
+        list.innerHTML = '<div class="empty">No notices published yet.</div>';
+        return;
+    }
+
+    list.innerHTML = notices.map((notice) => `
+        <div class="notice-card">
+            <strong>${notice.title || "School Notice"}</strong>
+            <div style="margin-top:8px;">${notice.message || ""}</div>
+            <div style="margin-top:10px; color:rgba(31,35,51,0.65);">Posted: ${String(notice.created_at || "").replace("T", " ").slice(0, 19) || "-"}</div>
+        </div>
+    `).join("");
+}
+
+function displayData(list) {
+    const container = document.getElementById("data");
+    if (!list.length) {
+        container.innerHTML = '<div class="empty">No student records found for the selected filters.</div>';
+        return;
+    }
+
+    container.innerHTML = list.map((student, index) => `
+        <div class="student-card">
+            <div class="student-head">
+                <img class="student-avatar" src="${avatarUrl(student)}" alt="Virtual avatar for ${student.name || "student"}">
+                <div>
+                    <h3>#${index + 1} ${student.name || ""}</h3>
+                    <p><strong>Student ID:</strong> ${student.student_unique_id || "-"}</p>
+                    <p><strong>Profile:</strong> Virtual student avatar generated from admission details</p>
+                </div>
+            </div>
+            <p><strong>Gender:</strong> ${student.gender || ""}</p>
+            <p><strong>Aadhaar:</strong> ${student.aadhaar || ""}</p>
+            <p><strong>Phone:</strong> ${student.phone || ""}</p>
+            <p><strong>Father:</strong> ${student.father || ""} (${student.focc || ""})</p>
+            <p><strong>Mother:</strong> ${student.mother || ""} (${student.mocc || ""})</p>
+            <p><strong>Previous School:</strong> ${student.school || ""}</p>
+            <p><strong>Class:</strong> ${student.class_name || ""}</p>
+            <p><strong>Medium:</strong> ${student.medium || ""}</p>
+            <p><strong>Nationality:</strong> ${student.nation || ""}</p>
+            <p><strong>State:</strong> ${student.state_name || ""}</p>
+            <p><strong>Religion:</strong> ${student.religion || ""}</p>
+            <p><strong>Caste:</strong> ${student.caste || ""}</p>
+            <p><strong>Remarks:</strong> ${student.remarks || ""}</p>
+        </div>
+    `).join("");
+}
+
+function applyFilters() {
+    const text = document.getElementById("search").value.toLowerCase();
+    const gender = document.getElementById("genderFilter").value;
+    const className = document.getElementById("classFilter").value;
+
+    const filtered = allStudents.filter((student) => {
+        const matchesName = (student.name || "").toLowerCase().includes(text);
+        const matchesGender = !gender || student.gender === gender;
+        const matchesClass = !className || student.class_name === className;
+        return matchesName && matchesGender && matchesClass;
+    });
+
+    displayData(filtered);
+}
+
+async function loadSummary() {
+    const result = await apiRequest("/dashboard_summary", {
+        headers: adminHeaders()
+    });
+    fillSummary(result.summary || {});
+}
+
+async function loadStudents() {
+    const result = await apiRequest("/get_students", {
+        headers: adminHeaders()
+    });
+    allStudents = result.students || [];
+    updateFilters();
+    applyFilters();
+}
+
+async function loadDueMembers() {
+    const result = await apiRequest("/due_members", {
+        headers: adminHeaders()
+    });
+    fillDueMembers(result.members || []);
+}
+
+async function loadNotices() {
+    const result = await apiRequest("/notices", {
+        headers: adminHeaders()
+    });
+    fillNotices(result.notices || []);
+}
+
+async function loadDashboard() {
+    if (!requireLogin()) {
+        return;
+    }
+
+    setStatus("Loading dashboard...");
+    try {
+        await Promise.all([loadSummary(), loadStudents(), loadDueMembers(), loadNotices()]);
+        setStatus(`Dashboard loaded with ${allStudents.length} student record(s).`);
+    } catch (error) {
+        if ((error.message || "").toLowerCase().includes("unauthorized")) {
+            clearAdminToken();
+            window.location.href = "login.html";
+            return;
+        }
+        setStatus(error.message || "Failed to load dashboard.", true);
+    }
+}
+
+async function exportCsv() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/export_students`, {
+            headers: adminHeaders()
+        });
+        if (!response.ok) {
+            const raw = await response.text();
+            throw new Error(raw || "Export failed.");
+        }
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "students_export.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+        setStatus("CSV export downloaded.");
+    } catch (error) {
+        setStatus(error.message || "Failed to export CSV.", true);
+    }
+}
+
+async function publishNotice() {
+    const title = document.getElementById("noticeTitle").value.trim();
+    const message = document.getElementById("noticeMessage").value.trim();
+
+    if (!title || !message) {
+        setStatus("Enter both notice title and notice message.", true);
+        return;
+    }
+
+    try {
+        await apiRequest("/notices", {
+            method: "POST",
+            headers: adminHeaders({
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({ title, message })
+        });
+        document.getElementById("noticeTitle").value = "";
+        document.getElementById("noticeMessage").value = "";
+        await loadNotices();
+        setStatus("Notice published for all students.");
+    } catch (error) {
+        setStatus(error.message || "Failed to publish notice.", true);
+    }
+}
+
+document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("genderFilter").addEventListener("change", applyFilters);
+document.getElementById("classFilter").addEventListener("change", applyFilters);
+document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
+document.getElementById("exportBtn").addEventListener("click", exportCsv);
+document.getElementById("toggleDueBtn").addEventListener("click", () => {
+    dueMembersVisible = !dueMembersVisible;
+    document.getElementById("dueMembersPanel").classList.toggle("hidden", !dueMembersVisible);
+    document.getElementById("toggleDueBtn").textContent = dueMembersVisible ? "Hide Due Members" : "View Due Members";
+});
+document.getElementById("publishNoticeBtn").addEventListener("click", publishNotice);
+document.getElementById("refreshNoticeBtn").addEventListener("click", loadNotices);
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+        await apiRequest("/logout", {
+            method: "POST",
+            headers: adminHeaders()
+        });
+    } catch (error) {
+        // Clear token even if backend logout fails.
+    }
+    clearAdminToken();
+    window.location.href = "login.html";
+});
+
+loadDashboard();
+</script>
+</body>
+</html>

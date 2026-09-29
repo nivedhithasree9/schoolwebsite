@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Management System</title>
+<style>
+:root {
+    --paper: #f8f4ea;
+    --ink: #1f2333;
+    --brand: #0f4c5c;
+    --brand-dark: #093845;
+    --accent: #c97f39;
+    --card: rgba(255, 252, 245, 0.88);
+    --line: rgba(31, 35, 51, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top right, rgba(201, 127, 57, 0.32), transparent 20%),
+        radial-gradient(circle at left center, rgba(15, 76, 92, 0.18), transparent 24%),
+        linear-gradient(140deg, #efe4d0, #f9f5ee 52%, #ece6db);
+}
+
+.shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 24px auto 40px;
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 56px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, rgba(255, 251, 244, 0.94), rgba(250, 243, 229, 0.85));
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 28px 80px rgba(43, 35, 22, 0.12);
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -70px -70px auto;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 127, 57, 0.18), transparent 65%);
+}
+
+.eyebrow {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(15, 76, 92, 0.08);
+    color: var(--brand);
+    letter-spacing: 0.08em;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+}
+
+h1 {
+    max-width: 760px;
+    margin: 18px 0 14px;
+    font-size: clamp(2.8rem, 5vw, 4.4rem);
+    line-height: 1.01;
+    letter-spacing: -0.04em;
+}
+
+.lead {
+    max-width: 700px;
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(31, 35, 51, 0.78);
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 36px;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 14px;
+    letter-spacing: -0.03em;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    padding: 24px 22px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 76, 92, 0.08);
+    box-shadow: 0 18px 40px rgba(31, 35, 51, 0.06);
+}
+
+.feature-card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+    color: var(--brand);
+}
+
+.feature-card p {
+    margin: 0;
+    color: rgba(31, 35, 51, 0.72);
+    line-height: 1.7;
+}
+
+.hero-note {
+    display: inline-flex;
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-radius: 22px;
+    background: rgba(15, 76, 92, 0.08);
+    color: var(--brand);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.btn,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    padding: 14px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.btn {
+    background: var(--brand);
+    color: #fff;
+}
+
+.btn:hover {
+    background: var(--brand-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: rgba(31, 35, 51, 0.06);
+    color: var(--ink);
+}
+
+.btn-secondary:hover {
+    background: rgba(31, 35, 51, 0.1);
+    transform: translateY(-1px);
+}
+
+.chat-widget {
+    position: fixed;
+    right: 24px;
+    bottom: 96px;
+    width: min(360px, calc(100% - 32px));
+    max-height: 520px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(31, 35, 51, 0.16);
+    box-shadow: 0 24px 80px rgba(31, 35, 51, 0.16);
+    overflow: hidden;
+    z-index: 20;
+}
+.chat-widget.hidden {
+    display: none;
+}
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--brand);
+    color: #fff;
+}
+.chat-subtitle {
+    margin-top: 4px;
+    font-size: 0.82rem;
+    opacity: 0.86;
+}
+.chat-messages {
+    flex: 1;
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    overflow-y: auto;
+    background: #f8f4ea;
+}
+.chat-message {
+    display: flex;
+}
+.chat-message.assistant .message-text {
+    background: rgba(15, 76, 92, 0.08);
+    color: var(--ink);
+}
+.chat-message.user .message-text {
+    margin-left: auto;
+    background: var(--brand);
+    color: #fff;
+}
+.message-text {
+    max-width: 100%;
+    padding: 12px 14px;
+    border-radius: 18px;
+    line-height: 1.55;
+    font-size: 0.95rem;
+}
+.chat-input-row {
+    display: grid;
+    gap: 10px;
+    padding: 14px 16px 18px;
+    background: #fff;
+}
+.chat-input-row textarea {
+    width: 100%;
+    min-height: 72px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(31, 35, 51, 0.14);
+    font: inherit;
+    line-height: 1.4;
+}
+.chat-input-row button {
+    justify-self: end;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+}
+.chat-toggle {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    padding: 14px 22px;
+    border: none;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 18px 40px rgba(31, 35, 51, 0.18);
+    z-index: 20;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        padding: 32px 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .shell {
+        width: calc(100% - 20px);
+        margin-top: 10px;
+    }
+
+    .stats,
+    .features {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <span class="eyebrow">School Management Platform</span>
+        <h1>Modern school operations with admissions, student access, and admin analytics.</h1>
+        <p class="lead">A secure, easy-to-use system designed for school administrators and students. Manage admissions, track student progress, share notices, and keep school workflows organized.</p>
+        <div class="hero-actions">
+            <a class="btn" href="form.html">Start New Admission</a>
+            <a class="btn-secondary" href="student_login.html">Student Login</a>
+            <a class="btn-secondary" href="login.html">Open Admin Dashboard</a>
+        </div>
+        <div class="hero-note">Secure school management with admission workflows, student access, and administrator analytics.</div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <strong>Admissions made simple</strong>
+            <p>Capture new student details in one place, generate unique IDs, and track enrollment progress with an easy-to-use admission form.</p>
+        </div>
+        <div class="feature-card">
+            <strong>Student self-service</strong>
+            <p>Students can log in securely, view schedules, check fees, and stay informed with notices on their personalized dashboard.</p>
+        </div>
+        <div class="feature-card">
+            <strong>Administrator insights</strong>
+            <p>Admin users can review student analytics, manage notices, and monitor fee status from a focused dashboard experience.</p>
+        </div>
+    </section>
+</div>
+
+<div class="chat-widget hidden" id="mainChatWidget">
+    <div class="chat-header">
+        <div>
+            <strong>Project Helper</strong>
+            <div class="chat-subtitle">Ask about how to use the system</div>
+        </div>
+        <button id="closeMainChat" type="button" aria-label="Close chat">×</button>
+    </div>
+    <div class="chat-messages" id="mainChatMessages">
+        <div class="chat-message assistant">
+            <div class="message-text">How can I help you?</div>
+        </div>
+    </div>
+    <div class="chat-input-row">
+        <textarea id="mainChatInput" placeholder="Type your question here..."></textarea>
+        <button id="sendMainChat" type="button">Send</button>
+    </div>
+</div>
+<button class="chat-toggle" id="openMainChat" type="button">Need Help?</button>
+
+<script>
+function appendMainChatMessage(text, sender = "assistant") {
+    const messages = document.getElementById("mainChatMessages");
+    const wrapper = document.createElement("div");
+    wrapper.className = `chat-message ${sender}`;
+    wrapper.innerHTML = `<div class="message-text">${text}</div>`;
+    messages.appendChild(wrapper);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function getMainChatResponse(question) {
+    const text = question.trim().toLowerCase();
+    if (!text) {
+        return "Please type a question so I can help you.";
+    }
+
+    const has = (words) => words.every((word) => text.includes(word));
+    const hasAny = (words) => words.some((word) => text.includes(word));
+
+    if (hasAny(["add student", "new student", "add new student", "new admission", "add admission"]) || (has(["add", "student"]) || has(["add", "admission"])) ) {
+        return "To add a new student, click Start New Admission. Then complete the form with the student’s name, class, DOB, contact details, and school information.";
+    }
+
+    if (hasAny(["student login", "login student", "student portal", "student sign in", "student signin"]) || (has(["student", "login"]) && !hasAny(["new student", "add student"]))) {
+        return "Click Student Login to access the student portal. Students can log in with their student ID or phone number and date of birth.";
+    }
+
+    if (hasAny(["admin dashboard", "admin login", "admin access", "analytics", "admin panel"])) {
+        return "Open Admin Dashboard to manage admissions, notices, and analytics. Admin users can log in from the admin page using their admin credentials.";
+    }
+
+    if (hasAny(["fee", "payment", "due amount", "fees" ])) {
+        return "Use the student portal to view fee payment status and due amounts. The fee payment page is available after student login.";
+    }
+
+    if (hasAny(["notice", "notices", "announcement", "announcements"])) {
+        return "Notices are shown to students in their dashboard notice board. Admins can publish notices from the admin dashboard.";
+    }
+
+    if (hasAny(["help", "how", "what", "where"])) {
+        return "Ask me anything about admission, student login, admin access, or how to navigate the system.";
+    }
+
+    return "I can help with admission, student login, admin dashboard usage, fees, and notices. Ask me a question about the main page or how to start.";
+}
+
+function openMainChat() {
+    document.getElementById("mainChatWidget").classList.remove("hidden");
+    document.getElementById("openMainChat").style.display = "none";
+    document.getElementById("mainChatInput").focus();
+}
+
+function closeMainChat() {
+    document.getElementById("mainChatWidget").classList.add("hidden");
+    document.getElementById("openMainChat").style.display = "inline-flex";
+}
+
+function sendMainChat() {
+    const input = document.getElementById("mainChatInput");
+    const question = input.value.trim();
+    if (!question) {
+        return;
+    }
+    appendMainChatMessage(question, "user");
+    input.value = "";
+    setTimeout(() => {
+        appendMainChatMessage(getMainChatResponse(question), "assistant");
+    }, 200);
+}
+
+document.getElementById("openMainChat").addEventListener("click", openMainChat);
+document.getElementById("closeMainChat").addEventListener("click", closeMainChat);
+document.getElementById("sendMainChat").addEventListener("click", sendMainChat);
+document.getElementById("mainChatInput").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMainChat();
+    }
+});
+</script>
+</body>
+</html>

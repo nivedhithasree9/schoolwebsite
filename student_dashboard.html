@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+<style>
+:root {
+    --ink: #1f2333;
+    --brand: #1f5c58;
+    --brand-dark: #164340;
+    --warm: #c97f39;
+    --paper: rgba(255, 252, 246, 0.96);
+    --line: rgba(31, 35, 51, 0.12);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top right, rgba(31, 92, 88, 0.16), transparent 20%),
+        radial-gradient(circle at left center, rgba(201, 127, 57, 0.18), transparent 18%),
+        linear-gradient(180deg, #f7f1e7, #eee4d6);
+}
+.shell {
+    width: min(1280px, calc(100% - 24px));
+    margin: 18px auto 34px;
+}
+.hero, .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(47, 37, 20, 0.1);
+}
+.hero { padding: 28px; }
+.hero-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(31, 92, 88, 0.08);
+    color: var(--brand);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+h1 { margin: 18px 0 8px; font-size: clamp(2rem, 4vw, 3.1rem); }
+.hero p { margin: 0; max-width: 760px; line-height: 1.65; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+.btn { background: var(--brand); color: #fff; }
+.btn:hover { background: var(--brand-dark); }
+.btn-secondary { background: rgba(31, 35, 51, 0.06); color: var(--ink); }
+.grid { display: grid; gap: 18px; margin-top: 20px; }
+.top-grid { grid-template-columns: 0.85fr 1.15fr; }
+.summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.double-grid { grid-template-columns: 1fr 1fr; }
+.panel { padding: 22px; }
+.profile-head { display: flex; gap: 16px; align-items: center; }
+.student-avatar {
+    width: 92px;
+    height: 92px;
+    border-radius: 26px;
+    object-fit: cover;
+    border: 1px solid rgba(31, 92, 88, 0.14);
+}
+.profile-meta p, .panel p { margin: 6px 0; line-height: 1.55; }
+.summary-card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    color: var(--brand);
+}
+.summary-card.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.summary-card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(31, 92, 88, 0.12);
+}
+.subject-card, .task-card, .mini-card, .timetable-row {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(31, 92, 88, 0.04);
+    border: 1px solid rgba(31, 92, 88, 0.08);
+}
+.subject-list, .task-list, .mini-list, .timetable-list { display: grid; gap: 12px; }
+.notice-board { display: grid; gap: 12px; }
+.notice-card {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(31, 92, 88, 0.04);
+    border: 1px solid rgba(31, 92, 88, 0.08);
+}
+.attendance-detail { display: none; }
+.attendance-detail.active { display: block; }
+.attendance-records { display: grid; gap: 12px; margin-top: 14px; }
+.attendance-record {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(31, 92, 88, 0.04);
+    border: 1px solid rgba(31, 92, 88, 0.08);
+}
+.present-tag, .absent-tag {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    margin-top: 8px;
+}
+.present-tag {
+    background: rgba(46, 125, 50, 0.12);
+    color: #2e7d32;
+}
+.absent-tag {
+    background: rgba(198, 40, 40, 0.12);
+    color: #c62828;
+}
+.status { min-height: 24px; margin-top: 12px; }
+
+    .chat-widget {
+        position: fixed;
+        right: 24px;
+        bottom: 96px;
+        width: min(360px, calc(100% - 32px));
+        max-height: 520px;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(31, 35, 51, 0.16);
+        border-radius: 24px;
+        box-shadow: 0 24px 80px rgba(31, 35, 51, 0.16);
+        overflow: hidden;
+        z-index: 20;
+    }
+    .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        background: #1f5c58;
+        color: #fff;
+    }
+    .chat-subtitle {
+        margin-top: 4px;
+        font-size: 0.82rem;
+        opacity: 0.86;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+        overflow-y: auto;
+        background: #fbf8f4;
+    }
+    .chat-message {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    .chat-message.assistant .message-text {
+        background: rgba(31, 92, 88, 0.08);
+        color: #1f2333;
+    }
+    .chat-message.user .message-text {
+        margin-left: auto;
+        background: #1f5c58;
+        color: #fff;
+    }
+    .message-text {
+        padding: 12px 14px;
+        border-radius: 18px;
+        max-width: 100%;
+        line-height: 1.55;
+        font-size: 0.95rem;
+    }
+    .chat-input-row {
+        display: grid;
+        gap: 10px;
+        padding: 14px 16px 18px;
+        background: #fff;
+    }
+    .chat-input-row textarea {
+        width: 100%;
+        min-height: 72px;
+        resize: vertical;
+        padding: 12px 14px;
+        border: 1px solid rgba(31, 35, 51, 0.14);
+        border-radius: 16px;
+        font: inherit;
+        line-height: 1.45;
+    }
+    .chat-input-row button {
+        justify-self: end;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 999px;
+        background: #1f5c58;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+    }
+    .chat-toggle {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        padding: 14px 22px;
+        border: none;
+        border-radius: 999px;
+        background: #1f5c58;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+        box-shadow: 0 18px 40px rgba(31, 35, 51, 0.18);
+        z-index: 20;
+    }
+    .chat-widget.hidden {
+        display: none;
+    }
+    .chat-header button {
+        width: 34px;
+        height: 34px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+@media (max-width: 980px) {
+    .top-grid, .summary-grid, .double-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+    .shell { width: calc(100% - 16px); margin-top: 10px; }
+    .top-grid, .summary-grid, .double-grid { grid-template-columns: 1fr; }
+    .actions { flex-direction: column; }
+    .chat-widget, .chat-toggle { right: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <div class="hero-top">
+            <span class="badge">Student Learning Portal</span>
+            <div class="actions">
+                <a class="btn-secondary" href="index.html">Home</a>
+                <a class="btn-secondary" href="fee_payment.html">Fee Payment</a>
+                <button class="btn" id="logoutBtn" type="button">Logout</button>
+            </div>
+        </div>
+        <h1 id="heroName">Student Dashboard</h1>
+        <p>Your school profile, attendance, marks, payments, homework, timetable, and class follow-up details are available here.</p>
+    </section>
+
+    <section class="grid top-grid">
+        <div class="panel">
+            <div class="profile-head">
+                <img class="student-avatar" id="studentAvatar" alt="Student virtual avatar">
+                <div class="profile-meta">
+                    <h2 id="profileName">Student Name</h2>
+                    <p><strong>Admission No:</strong> <span id="admissionNo">-</span></p>
+                    <p><strong>Class:</strong> <span id="profileClass">-</span></p>
+                    <p><strong>Medium:</strong> <span id="profileMedium">-</span></p>
+                </div>
+            </div>
+            <div class="mini-list" style="margin-top:16px;">
+                <div class="mini-card"><strong>School:</strong> <span id="schoolName">-</span></div>
+                <div class="mini-card"><strong>Class Teacher:</strong> <span id="classTeacher">-</span></div>
+                <div class="mini-card"><strong>School Timings:</strong> <span id="schoolTimings">-</span></div>
+                <div class="mini-card"><strong>Phone:</strong> <span id="profilePhone">-</span></div>
+            </div>
+        </div>
+
+        <div class="grid summary-grid" style="margin-top:0;">
+            <div class="panel summary-card clickable" id="attendanceCard">
+                <strong id="overallAttendance">0%</strong>
+                Attendance
+            </div>
+            <div class="panel summary-card">
+                <strong id="overallMarks">0</strong>
+                Overall Marks
+            </div>
+            <div class="panel summary-card">
+                <strong id="paidAmount">0</strong>
+                Fee Paid
+            </div>
+            <div class="panel summary-card clickable" id="dueFeeCard">
+                <strong id="dueAmount">0</strong>
+                Fee Due
+            </div>
+        </div>
+    </section>
+
+    <section class="panel attendance-detail" id="attendanceDetail">
+        <h2>Attendance Details</h2>
+        <p>Subject-wise present and absent periods with date, day, and time period.</p>
+        <div class="attendance-records" id="attendanceRecords"></div>
+    </section>
+
+    <section class="grid double-grid">
+        <div class="panel">
+            <h2>Notice Board</h2>
+            <div class="notice-board" id="noticeBoard"></div>
+        </div>
+        <div class="panel">
+            <h2>Subjects, Teachers, Attendance, Marks</h2>
+            <div class="subject-list" id="subjectsList"></div>
+        </div>
+        <div class="panel">
+            <h2>Timetable</h2>
+            <div class="timetable-list" id="timetableList"></div>
+        </div>
+    </section>
+
+    <section class="grid double-grid">
+        <div class="panel">
+            <h2>Fee Payment And Fines</h2>
+            <div class="mini-list" id="feesList"></div>
+            <div class="mini-card" style="margin-top:12px;"><strong>Pending Fine:</strong> <span id="fineAmount">-</span></div>
+            <div class="mini-card" style="margin-top:12px;"><strong>Reason:</strong> <span id="fineReason">-</span></div>
+        </div>
+        <div class="panel">
+            <h2>Uniform Color Code</h2>
+            <div class="mini-list" id="uniformList"></div>
+        </div>
+    </section>
+
+    <section class="grid double-grid">
+        <div class="panel">
+            <h2>Homework Section</h2>
+            <div class="task-list" id="homeworkList"></div>
+        </div>
+        <div class="panel">
+            <h2>Missed Class Topics</h2>
+            <div class="task-list" id="missedList"></div>
+        </div>
+    </section>
+
+    <div class="status" id="status"></div>
+
+    <div class="chat-widget hidden" id="aiChatWidget">
+        <div class="chat-header">
+            <div>
+                <strong>Student Assistant</strong>
+                <div class="chat-subtitle">Ask questions about this dashboard</div>
+            </div>
+            <button id="closeChatBtn" type="button" aria-label="Close chat">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message assistant">
+                <div class="message-text">Hi there! I can guide you through the student dashboard. Ask me about attendance, fees, homework, timetable, notices, or profile details.</div>
+            </div>
+        </div>
+        <div class="chat-input-row">
+            <textarea id="chatInput" placeholder="Type your question here..." rows="2"></textarea>
+            <button id="sendChatBtn" type="button">Send</button>
+        </div>
+    </div>
+    <button class="chat-toggle" id="openChatBtn" type="button">Help</button>
+</div>
+
+<script src="api.js"></script>
+<script>
+function studentHeaders(extra = {}) {
+    return {
+        ...extra,
+        "X-Student-Token": getStudentToken()
+    };
+}
+
+function setStatus(message, isError = false) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.style.color = isError ? "#a61b1b" : "#1f5c58";
+}
+
+function requireStudentLogin() {
+    if (!getStudentToken()) {
+        window.location.href = "student_login.html";
+        return false;
+    }
+    return true;
+}
+
+function fillDashboard(data) {
+    const profile = data.profile || {};
+    document.getElementById("heroName").textContent = `${profile.name || "Student"} Dashboard`;
+    document.getElementById("profileName").textContent = profile.name || "Student Name";
+    document.getElementById("admissionNo").textContent = profile.admission_no || "-";
+    document.getElementById("profileClass").textContent = profile.class_name || "-";
+    document.getElementById("profileMedium").textContent = profile.medium || "-";
+    document.getElementById("schoolName").textContent = data.school_overview?.campus || "-";
+    document.getElementById("classTeacher").textContent = data.school_overview?.class_teacher || "-";
+    document.getElementById("schoolTimings").textContent = data.school_overview?.school_timings || "-";
+    document.getElementById("profilePhone").textContent = profile.phone || "-";
+    document.getElementById("overallAttendance").textContent = `${data.attendance_summary?.overall || 0}%`;
+    document.getElementById("overallMarks").textContent = data.marks_summary?.overall || 0;
+    document.getElementById("paidAmount").textContent = data.fees?.paid_amount || 0;
+    document.getElementById("dueAmount").textContent = data.fees?.due_amount || 0;
+    document.getElementById("fineAmount").textContent = data.fines?.pending_fine || 0;
+    document.getElementById("fineReason").textContent = data.fines?.reason || "-";
+    document.getElementById("studentAvatar").src = avatarUrl({
+        name: profile.name,
+        phone: profile.phone,
+        gender: profile.gender
+    });
+    document.getElementById("attendanceRecords").innerHTML = (data.attendance_summary?.records || []).map((record) => `
+        <div class="attendance-record">
+            <strong>${record.subject}</strong>
+            <div>Date: ${record.date}</div>
+            <div>Day: ${record.day}</div>
+            <div>Period: ${record.period}</div>
+            <div class="${record.status === "Present" ? "present-tag" : "absent-tag"}">${record.status}</div>
+        </div>
+    `).join("");
+
+    document.getElementById("subjectsList").innerHTML = (data.subjects || []).map((subject) => `
+        <div class="subject-card">
+            <strong>${subject.name}</strong>
+            <div>Teacher: ${subject.teacher}</div>
+            <div>Attendance: ${subject.attendance}%</div>
+            <div>Marks: ${subject.marks}</div>
+        </div>
+    `).join("");
+
+    document.getElementById("timetableList").innerHTML = (data.timetable || []).map((row) => `
+        <div class="timetable-row">
+            <strong>${row.day}</strong>
+            <div>${(row.slots || []).join(" | ")}</div>
+        </div>
+    `).join("");
+
+    document.getElementById("feesList").innerHTML = (data.fees?.payments || []).map((item) => `
+        <div class="mini-card">
+            <strong>${item.label}</strong>
+            <div>Amount: ${item.amount}</div>
+            <div>Status: ${item.status}</div>
+        </div>
+    `).join("");
+
+    const uniform = data.uniform || {};
+    document.getElementById("uniformList").innerHTML = `
+        <div class="mini-card"><strong>Monday-Thursday:</strong> ${uniform.monday_to_thursday || "-"}</div>
+        <div class="mini-card"><strong>Friday:</strong> ${uniform.friday || "-"}</div>
+        <div class="mini-card"><strong>Shoes:</strong> ${uniform.shoes || "-"}</div>
+        <div class="mini-card"><strong>Winter:</strong> ${uniform.winter || "-"}</div>
+    `;
+
+    document.getElementById("homeworkList").innerHTML = (data.homeworks || []).map((item) => `
+        <div class="task-card">
+            <strong>${item.subject}</strong>
+            <div>${item.task}</div>
+        </div>
+    `).join("");
+
+    document.getElementById("missedList").innerHTML = (data.missed_classes || []).map((item) => `
+        <div class="task-card">
+            <strong>${item.subject}</strong>
+            <div>${item.date}</div>
+            <div>${item.topic}</div>
+        </div>
+    `).join("");
+}
+
+function fillNotices(notices) {
+    const board = document.getElementById("noticeBoard");
+    if (!notices.length) {
+        board.innerHTML = '<div class="notice-card">No active notices right now.</div>';
+        return;
+    }
+
+    board.innerHTML = notices.map((notice) => `
+        <div class="notice-card">
+            <strong>${notice.title || "School Notice"}</strong>
+            <div style="margin-top:8px;">${notice.message || ""}</div>
+        </div>
+    `).join("");
+}
+
+async function loadNotices() {
+    try {
+        const result = await apiRequest("/public_notices");
+        const notices = result.notices || [];
+        fillNotices(notices);
+
+        if (notices.length) {
+            const latestNotice = notices[0];
+            const alertKey = `student-notice-${latestNotice.id}`;
+            if (!sessionStorage.getItem(alertKey)) {
+                sessionStorage.setItem(alertKey, "shown");
+                alert(`${latestNotice.title}\n\n${latestNotice.message}`);
+            }
+        }
+    } catch (error) {
+        document.getElementById("noticeBoard").innerHTML = '<div class="notice-card">Unable to load notices right now.</div>';
+    }
+}
+
+async function loadStudentDashboard() {
+    if (!requireStudentLogin()) {
+        return;
+    }
+
+    setStatus("Loading student dashboard...");
+    try {
+        const [dashboardResult] = await Promise.all([
+            apiRequest("/student_dashboard", {
+                headers: studentHeaders()
+            }),
+            loadNotices()
+        ]);
+        fillDashboard(dashboardResult.dashboard || {});
+        setStatus("Student dashboard loaded successfully.");
+    } catch (error) {
+        if ((error.message || "").toLowerCase().includes("unauthorized")) {
+            clearStudentToken();
+            window.location.href = "student_login.html";
+            return;
+        }
+        setStatus(error.message || "Failed to load student dashboard.", true);
+    }
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+        await apiRequest("/student_logout", {
+            method: "POST",
+            headers: studentHeaders()
+        });
+    } catch (error) {
+        // Clear token anyway.
+    }
+    clearStudentToken();
+    window.location.href = "student_login.html";
+});
+
+document.getElementById("attendanceCard").addEventListener("click", () => {
+    document.getElementById("attendanceDetail").classList.toggle("active");
+});
+
+document.getElementById("dueFeeCard").addEventListener("click", () => {
+    window.location.href = "fee_payment.html";
+});
+
+function appendChatMessage(text, sender = "assistant") {
+    const messages = document.getElementById("chatMessages");
+    const wrapper = document.createElement("div");
+    wrapper.className = `chat-message ${sender}`;
+    wrapper.innerHTML = `<div class="message-text">${text}</div>`;
+    messages.appendChild(wrapper);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function getAssistantResponse(question) {
+    const text = question.trim().toLowerCase();
+
+    if (!text) {
+        return "Please type a question so I can help you.";
+    }
+
+    if (text.includes("attendance")) {
+        return "The Attendance card shows your overall attendance percentage. Click the Attendance card to view detailed subject-wise attendance records below.";
+    }
+    if (text.includes("fee") || text.includes("payment") || text.includes("due")) {
+        return "Check the Fee Payment And Fines section for your paid amount, due amount, and fines. Use the Fee Payment button to make payments or review payment history.";
+    }
+    if (text.includes("homework") || text.includes("missed")) {
+        return "The Homework Section shows assigned tasks, and the Missed Class Topics section explains what you missed. Review these daily to stay up to date.";
+    }
+    if (text.includes("timetable") || text.includes("schedule")) {
+        return "The Timetable panel shows your weekly class schedule. You can use it to know which subject is next and when your classes begin.";
+    }
+    if (text.includes("notice")) {
+        return "Important school notices appear in the Notice Board. Check this panel regularly for announcements and updates from the school.";
+    }
+    if (text.includes("profile") || text.includes("admission") || text.includes("phone")) {
+        return "Your profile information is shown at the top left, including name, admission number, class, medium, and contact details.";
+    }
+    if (text.includes("logout") || text.includes("sign out") || text.includes("exit")) {
+        return "Click the Logout button at the top to safely sign out of the student dashboard.";
+    }
+    if (text.includes("help") || text.includes("how") || text.includes("what")) {
+        return "Ask me about attendance, fees, homework, timetable, notices, profile details, or how to navigate the student dashboard.";
+    }
+    return "I can help with questions about attendance, fees, homework, timetable, notices, and your profile. Ask me anything about the student dashboard.";
+}
+
+function openChat() {
+    document.getElementById("aiChatWidget").classList.remove("hidden");
+    document.getElementById("openChatBtn").style.display = "none";
+    document.getElementById("chatInput").focus();
+}
+
+function closeChat() {
+    document.getElementById("aiChatWidget").classList.add("hidden");
+    document.getElementById("openChatBtn").style.display = "inline-flex";
+}
+
+function sendChat() {
+    const input = document.getElementById("chatInput");
+    const question = input.value.trim();
+    if (!question) {
+        return;
+    }
+    appendChatMessage(question, "user");
+    input.value = "";
+    setTimeout(() => {
+        appendChatMessage(getAssistantResponse(question), "assistant");
+    }, 200);
+}
+
+document.getElementById("openChatBtn").addEventListener("click", openChat);
+document.getElementById("closeChatBtn").addEventListener("click", closeChat);
+document.getElementById("sendChatBtn").addEventListener("click", sendChat);
+document.getElementById("chatInput").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChat();
+    }
+});
+
+loadStudentDashboard();
+</script>
+</body>
+</html>

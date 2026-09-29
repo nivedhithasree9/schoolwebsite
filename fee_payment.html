@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fee Payment</title>
+<style>
+:root {
+    --ink: #1f2333;
+    --brand: #1f5c58;
+    --brand-dark: #164340;
+    --warm: #c97f39;
+    --paper: rgba(255, 252, 246, 0.96);
+    --line: rgba(31, 35, 51, 0.12);
+    --danger: #b23b3b;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(31, 92, 88, 0.16), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(201, 127, 57, 0.18), transparent 18%),
+        linear-gradient(180deg, #f7f1e7, #eee4d6);
+}
+.shell {
+    width: min(1180px, calc(100% - 24px));
+    margin: 18px auto 32px;
+}
+.hero, .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(47, 37, 20, 0.1);
+}
+.hero { padding: 28px; }
+.hero-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(31, 92, 88, 0.08);
+    color: var(--brand);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+h1 { margin: 18px 0 8px; font-size: clamp(2rem, 4vw, 3rem); }
+.hero p { margin: 0; max-width: 760px; line-height: 1.65; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+.btn { background: var(--brand); color: #fff; }
+.btn:hover { background: var(--brand-dark); }
+.btn-secondary { background: rgba(31, 35, 51, 0.06); color: var(--ink); }
+.grid { display: grid; gap: 18px; margin-top: 20px; }
+.top-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.double-grid { grid-template-columns: 1.1fr 0.9fr; }
+.panel { padding: 22px; }
+.summary-card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    color: var(--brand);
+}
+.summary-card.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.summary-card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(31, 92, 88, 0.12);
+}
+.pay-list, .note-list { display: grid; gap: 12px; }
+.pay-item, .note-item, .receipt {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(31, 92, 88, 0.04);
+    border: 1px solid rgba(31, 92, 88, 0.08);
+}
+.payment-form {
+    display: grid;
+    gap: 12px;
+}
+.payment-form input,
+.payment-form select {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    font: inherit;
+}
+.qr-panel {
+    text-align: center;
+}
+.qr-panel img {
+    width: min(240px, 100%);
+    display: block;
+    margin: 0 auto 12px;
+    border-radius: 24px;
+}
+.payment-section {
+    display: none;
+}
+.payment-section.active {
+    display: grid;
+}
+.due {
+    color: var(--danger);
+    font-weight: bold;
+}
+.success {
+    color: #2e7d32;
+    font-weight: bold;
+}
+.receipt p, .pay-item p, .note-item p { margin: 6px 0; line-height: 1.55; }
+.status { min-height: 24px; margin-top: 14px; }
+@media (max-width: 920px) {
+    .top-grid, .double-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+    .shell { width: calc(100% - 16px); margin-top: 10px; }
+    .top-grid, .double-grid { grid-template-columns: 1fr; }
+    .actions { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <div class="hero-top">
+            <span class="badge">Student Fee Portal</span>
+            <div class="actions">
+                <a class="btn-secondary" href="student_dashboard.html">Back To Dashboard</a>
+                <a class="btn-secondary" href="index.html">Home</a>
+            </div>
+        </div>
+        <h1>Fee Payment Details</h1>
+        <p>Review paid installments, pending dues, fines, and the receipt-style summary for school office verification.</p>
+    </section>
+
+    <section class="grid top-grid">
+        <div class="panel summary-card">
+            <strong id="totalFee">0</strong>
+            Total Fee
+        </div>
+        <div class="panel summary-card">
+            <strong id="paidFee">0</strong>
+            Paid Amount
+        </div>
+        <div class="panel summary-card clickable" id="dueCard">
+            <strong id="dueFee">0</strong>
+            Due Amount
+        </div>
+        <div class="panel summary-card">
+            <strong id="fineFee">0</strong>
+            Fine Amount
+        </div>
+    </section>
+
+    <section class="grid double-grid">
+        <div class="panel">
+            <h2>Installment Status</h2>
+            <div class="pay-list" id="paymentsList"></div>
+        </div>
+        <div class="panel">
+            <h2>Receipt View</h2>
+            <div class="receipt">
+                <p><strong>Student Name:</strong> <span id="studentName">-</span></p>
+                <p><strong>Student ID:</strong> <span id="studentId">-</span></p>
+                <p><strong>Class:</strong> <span id="studentClass">-</span></p>
+                <p><strong>Paid So Far:</strong> <span id="receiptPaid">-</span></p>
+                <p><strong>Pending Due:</strong> <span id="receiptDue">-</span></p>
+                <p><strong>Fine:</strong> <span id="receiptFine">-</span></p>
+                <p><strong>Status:</strong> <span id="receiptStatus">-</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid double-grid payment-section" id="paymentSection">
+        <div class="panel">
+            <h2>Pay Pending Fee</h2>
+            <div class="payment-form">
+                <div>
+                    <label for="paymentMethod">Payment Method</label>
+                    <select id="paymentMethod">
+                        <option>PhonePe</option>
+                        <option>Google Pay</option>
+                        <option>Paytm</option>
+                        <option>UPI</option>
+                        <option>Card</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="paymentAmount">Amount</label>
+                    <input id="paymentAmount" type="number" min="1" placeholder="Enter amount">
+                </div>
+                <button class="btn" id="generateQrBtn" type="button">Generate QR Code</button>
+            </div>
+        </div>
+        <div class="panel qr-panel">
+            <h2>Payment QR</h2>
+            <img id="paymentQr" alt="Payment QR code preview">
+            <p id="paymentHint">Choose a payment method and amount to generate a scan code.</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Payment Notes</h2>
+        <div class="note-list" id="notesList"></div>
+        <div class="status" id="status"></div>
+    </section>
+</div>
+
+<script src="api.js"></script>
+<script>
+let currentProfile = {};
+
+function studentHeaders(extra = {}) {
+    return {
+        ...extra,
+        "X-Student-Token": getStudentToken()
+    };
+}
+
+function setStatus(message, isError = false) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.style.color = isError ? "#a61b1b" : "#1f5c58";
+}
+
+function requireStudentLogin() {
+    if (!getStudentToken()) {
+        window.location.href = "student_login.html";
+        return false;
+    }
+    return true;
+}
+
+function fillFeePage(dashboard) {
+    const profile = dashboard.profile || {};
+    currentProfile = profile;
+    const fees = dashboard.fees || {};
+    const fines = dashboard.fines || {};
+    const dueAmount = fees.due_amount || 0;
+    const fineAmount = fines.pending_fine || 0;
+
+    document.getElementById("totalFee").textContent = fees.total_fee || 0;
+    document.getElementById("paidFee").textContent = fees.paid_amount || 0;
+    document.getElementById("dueFee").textContent = dueAmount;
+    document.getElementById("fineFee").textContent = fineAmount;
+
+    document.getElementById("studentName").textContent = profile.name || "-";
+    document.getElementById("studentId").textContent = profile.admission_no || "-";
+    document.getElementById("studentClass").textContent = profile.class_name || "-";
+    document.getElementById("receiptPaid").textContent = fees.paid_amount || 0;
+    document.getElementById("receiptDue").textContent = dueAmount;
+    document.getElementById("receiptFine").textContent = fineAmount;
+    document.getElementById("receiptStatus").textContent = dueAmount > 0 ? "Pending" : "Paid";
+    document.getElementById("receiptStatus").className = dueAmount > 0 ? "due" : "success";
+    document.getElementById("paymentAmount").value = dueAmount || fineAmount || "";
+
+    document.getElementById("paymentsList").innerHTML = (fees.payments || []).map((item) => `
+        <div class="pay-item">
+            <p><strong>${item.label}</strong></p>
+            <p>Amount: ${item.amount}</p>
+            <p class="${item.status === "Paid" ? "success" : "due"}">Status: ${item.status}</p>
+        </div>
+    `).join("");
+
+    document.getElementById("notesList").innerHTML = `
+        <div class="note-item">
+            <p><strong>Payment Mode:</strong> School office / online transfer</p>
+            <p><strong>Pending Fine Reason:</strong> ${fines.reason || "No pending fine"}</p>
+        </div>
+        <div class="note-item">
+            <p><strong>Important:</strong> Keep the student ID and receipt ready while paying fees at reception.</p>
+            <p><strong>Help Desk:</strong> Contact the school office for installment changes or due clarification.</p>
+        </div>
+    `;
+
+    updatePaymentQr();
+    document.getElementById("paymentSection").classList.remove("active");
+}
+
+function updatePaymentQr() {
+    const method = document.getElementById("paymentMethod").value;
+    const amount = document.getElementById("paymentAmount").value.trim();
+    const studentId = currentProfile.admission_no || currentProfile.student_unique_id || "000000";
+
+    if (!amount) {
+        document.getElementById("paymentQr").src = paymentQrUrl({
+            studentId,
+            amount: "0",
+            method
+        });
+        document.getElementById("paymentHint").textContent = "Choose a payment method and amount to generate a scan code.";
+        return;
+    }
+
+    document.getElementById("paymentQr").src = paymentQrUrl({
+        studentId,
+        amount,
+        method
+    });
+    document.getElementById("paymentHint").textContent = `${method} QR ready for Rs. ${amount} - scan to pay using student ID ${studentId}.`;
+}
+
+async function loadFeePage() {
+    if (!requireStudentLogin()) {
+        return;
+    }
+    setStatus("Loading fee details...");
+    try {
+        const result = await apiRequest("/student_dashboard", {
+            headers: studentHeaders()
+        });
+        fillFeePage(result.dashboard || {});
+        setStatus("Fee payment page loaded.");
+    } catch (error) {
+        if ((error.message || "").toLowerCase().includes("unauthorized")) {
+            clearStudentToken();
+            window.location.href = "student_login.html";
+            return;
+        }
+        setStatus(error.message || "Failed to load fee details.", true);
+    }
+}
+
+document.getElementById("generateQrBtn").addEventListener("click", updatePaymentQr);
+document.getElementById("paymentMethod").addEventListener("change", updatePaymentQr);
+document.getElementById("paymentAmount").addEventListener("input", updatePaymentQr);
+document.getElementById("dueCard").addEventListener("click", () => {
+    document.getElementById("paymentSection").classList.add("active");
+    document.getElementById("paymentAmount").focus();
+    setStatus("Select payment method and enter the amount to pay.");
+});
+
+loadFeePage();
+</script>
+</body>
+</html>

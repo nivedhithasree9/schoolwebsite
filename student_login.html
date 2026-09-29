@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Login</title>
+<style>
+:root {
+    --ink: #1f2333;
+    --brand: #1f5c58;
+    --brand-dark: #164340;
+    --paper: rgba(255, 252, 246, 0.96);
+    --line: rgba(31, 35, 51, 0.12);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(31, 92, 88, 0.2), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(201, 127, 57, 0.18), transparent 20%),
+        linear-gradient(180deg, #f6f1e8, #ece2d4);
+}
+.shell {
+    width: min(560px, calc(100% - 24px));
+}
+.panel {
+    border-radius: 28px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(44, 31, 20, 0.12);
+}
+.panel { padding: 34px 28px; }
+.badge {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(31, 92, 88, 0.08);
+    color: var(--brand);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+h1 { margin: 18px 0 10px; font-size: clamp(2rem, 4vw, 3rem); }
+.lead { margin: 0 0 24px; line-height: 1.65; }
+label { display: block; margin-bottom: 6px; font-size: 0.95rem; }
+input {
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font: inherit;
+}
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.btn, .btn-secondary {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+.btn { background: var(--brand); color: #fff; }
+.btn:hover { background: var(--brand-dark); }
+.btn-secondary { background: rgba(31, 35, 51, 0.06); color: var(--ink); }
+.btn-secondary:hover { background: rgba(31, 35, 51, 0.1); }
+.status { min-height: 24px; margin-top: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="shell">
+    <div class="panel">
+        <span class="badge">Student Portal Access</span>
+        <h1>Student Login</h1>
+        <p class="lead">Students can sign in with their unique student ID or phone number. The password is their date of birth.</p>
+
+        <label for="loginId">Student ID Or Phone Number</label>
+        <input id="loginId" placeholder="Enter student ID or phone number">
+
+        <label for="dob">Date Of Birth</label>
+        <input id="dob" type="date">
+
+        <div class="actions">
+            <a class="btn-secondary" href="index.html">Back</a>
+            <button class="btn" id="loginBtn" type="button">Login</button>
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+function setStatus(message, isError = false) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.style.color = isError ? "#a61b1b" : "#1f5c58";
+}
+
+function fillNotices(notices) {
+    // Notice cards were removed from this page.
+    if (notices.length) {
+        const latestNotice = notices[0];
+        const alertKey = `student-login-notice-${latestNotice.id}`;
+        if (!sessionStorage.getItem(alertKey)) {
+            sessionStorage.setItem(alertKey, "shown");
+            alert(`${latestNotice.title}\n\n${latestNotice.message}`);
+        }
+    }
+}
+
+async function loadNotices() {
+    try {
+        const result = await apiRequest("/public_notices");
+        const notices = result.notices || [];
+        fillNotices(notices);
+    } catch (error) {
+        // Ignore notice load error on login page.
+    }
+}
+
+async function studentLogin() {
+    const loginId = document.getElementById("loginId").value.trim();
+    const dob = document.getElementById("dob").value.trim();
+
+    if (!loginId || !dob) {
+        setStatus("Enter student ID or phone number and DOB.", true);
+        return;
+    }
+
+    const button = document.getElementById("loginBtn");
+    button.disabled = true;
+    setStatus("Signing in...");
+
+    try {
+        const result = await apiRequest("/student_login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ login_id: loginId, dob })
+        });
+        setStudentToken(result.token);
+        window.location.href = "student_dashboard.html";
+    } catch (error) {
+        clearStudentToken();
+        setStatus(error.message || "Student login failed.", true);
+    } finally {
+        button.disabled = false;
+    }
+}
+
+document.getElementById("loginBtn").addEventListener("click", studentLogin);
+loadNotices();
+</script>
+</body>
+</html>
